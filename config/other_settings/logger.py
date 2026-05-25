@@ -2,8 +2,6 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-from .formatters import JsonFormatter
-
 LOGS_DIR = BASE_DIR / 'logs'
 LOGS_DIR.mkdir(exist_ok=True)
 
@@ -11,13 +9,19 @@ LOGS_DIR.mkdir(exist_ok=True)
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'filters': {
+        'exclude_static': {
+            '()': 'config.other_settings.filters.ExcludeStaticFilter',
+        },
+    },
     'formatters': {
         'verbose': {
             'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
             'style': '{',
         },
         'json': {
-            '()': JsonFormatter,
+            '()': 'config.other_settings.formatters.CustomJsonFormatter',
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s',
         },
     },
     'handlers': {
@@ -25,6 +29,7 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
+            'filters': ['exclude_static'],
         },
         'file': {
             'level': 'INFO',
@@ -33,6 +38,7 @@ LOGGING = {
             'maxBytes': 10485760,  # 10 MB
             'backupCount': 5,
             'formatter': 'json',
+            'filters': ['exclude_static'],
         },
         'error_file': {
             'level': 'ERROR',
@@ -41,6 +47,7 @@ LOGGING = {
             'maxBytes': 10485760,  # 10 MB
             'backupCount': 5,
             'formatter': 'json',
+            'filters': ['exclude_static'],
         },
     },
     'loggers': {
@@ -48,6 +55,13 @@ LOGGING = {
             'handlers': ['console', 'file', 'error_file'],
             'level': 'INFO',
             'propagate': True,
+        },
+        # Ensure django.server (WSGI logs) also pass through our handlers directly
+        # or rely on propagation to the 'django' logger.
+        'django.server': {
+            'handlers': ['console', 'file', 'error_file'],
+            'level': 'INFO',
+            'propagate': False,
         },
     },
 }
