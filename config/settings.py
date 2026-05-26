@@ -11,24 +11,11 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-class EnvironmentSettings(BaseSettings):
-    SECRET_KEY: str
-    DEBUG: bool = False
-    ALLOWED_HOSTS: str = "*"
-    TIME_ZONE: str = "Asia/Bangkok"
-
-    model_config = SettingsConfigDict(
-        env_file=str(BASE_DIR / ".env"),
-        env_file_encoding="utf-8",
-        extra="ignore"
-    )
-
-env = EnvironmentSettings()
+from .other_settings.env import env
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -89,8 +76,12 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env.DB_NAME,
+        "USER": env.DB_USER,
+        "PASSWORD": env.DB_PASSWORD,
+        "HOST": env.DB_HOST,
+        "PORT": env.DB_PORT,
     }
 }
 

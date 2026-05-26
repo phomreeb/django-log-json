@@ -1,0 +1,33 @@
+# Version Control
+.git/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Logs
+logs/
+*.log
+
+# Database
+db.sqlite3
+
+# Environment Variables
+.env
+
+# Package Management
+.nox/
+.tox/
+
+# IDEs / Editor
+.idea/
+.vscode/
+*.swp
+.DS_Store
